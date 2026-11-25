@@ -1,0 +1,18 @@
+# Core (stdlib-adjacent, required for the pipeline to run at all)
+pytest>=7.4,<9.0
+coverage>=7.4,<8.0
+PyYAML>=6.0,<7.0
+
+# Orchestration (optional at runtime: the CLI falls back to a dependency-free
+# sequential pipeline if these are not installed - see README "Engines")
+langgraph>=0.2.45,<0.3.0
+langgraph-checkpoint-sqlite>=2.0.0,<3.0.0
+
+# LLM-backed test drafting (optional at runtime: falls back to a clearly
+# marked TODO template if ANTHROPIC_API_KEY is not set or this package is
+# missing - see README)
+anthropic>=0.39.0,<1.0.0
+
+# Observability (optional at runtime: tracing becomes a safe no-op if
+# LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY are not set)
+langfuse>=2.53.0,<3.0.0

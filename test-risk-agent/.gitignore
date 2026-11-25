@@ -1,0 +1,20 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Secrets
+.env
+
+# Runtime artifacts (review queue, audit log, generated reports, checkpoints)
+data/
+!data/.gitkeep
+
+# Sample target repo's own coverage/test artifacts
+sample_target_repo/.coverage
+sample_target_repo/htmlcov/
+sample_target_repo/.pytest_cache/
+sample_target_repo/coverage.json
+sample_target_repo/coverage_after.json

@@ -1,0 +1,11 @@
+# Weights used to combine the three risk signals into one score.
+# They are re-normalized to sum to 1.0 at load time, so you can tune the
+# relative *ratio* between them without worrying about the absolute sum.
+#
+#   risk_score = w.change_frequency * normalize(log(change_frequency))
+#              + w.complexity       * normalize(log(cyclomatic_complexity))
+#              + w.coverage_gap     * coverage_gap   (already in [0, 1])
+weights:
+  change_frequency: 0.4
+  complexity: 0.3
+  coverage_gap: 0.3
