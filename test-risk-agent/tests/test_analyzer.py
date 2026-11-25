@@ -2,7 +2,7 @@ import json
 import subprocess
 from pathlib import Path
 
-from test_risk_agent.analyzer import analyze_repo
+from agents.repo_scanner import analyze_repo
 
 
 def _git(args, cwd: Path):

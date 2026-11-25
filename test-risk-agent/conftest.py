@@ -1,7 +1,7 @@
-"""Makes `src/` importable as `test_risk_agent` for the agent's own test suite."""
+"""Makes the project root importable (agents/, workflow/, review/, audit/, core/) for tests."""
 import sys
 from pathlib import Path
 
-SRC_DIR = Path(__file__).resolve().parent / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
+PROJECT_ROOT = Path(__file__).resolve().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))

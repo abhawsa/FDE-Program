@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from test_risk_agent.config import RiskWeights, Settings, load_risk_weights
+from core.config import RiskWeights, Settings, load_risk_weights
 
 
 def test_risk_weights_normalized_sums_to_one():

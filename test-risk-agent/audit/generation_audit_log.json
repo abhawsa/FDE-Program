@@ -1,0 +1,53 @@
+[
+  {
+    "timestamp": 1795606274.8214266,
+    "event": "review_decision",
+    "draft_id": "draft_f2bf5ab7ce22",
+    "decision": "approve",
+    "reviewer": "test-reviewer",
+    "comment": null,
+    "file": "pkg/mod.py",
+    "qualname": "risky",
+    "risk_score": 0.575,
+    "risk_components": {
+      "change_frequency_raw": 1,
+      "change_frequency_norm": 0.5,
+      "complexity_raw": 2,
+      "complexity_norm": 0.5,
+      "coverage_gap": 0.75,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_risky_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "386891bd1ffb49999a4da1ea6d2e4f1e"
+  },
+  {
+    "timestamp": 1795606274.8487804,
+    "event": "test_applied",
+    "draft_id": "draft_f2bf5ab7ce22",
+    "file": "pkg/mod.py",
+    "qualname": "risky",
+    "risk_score": 0.575,
+    "risk_components": {
+      "change_frequency_raw": 1,
+      "change_frequency_norm": 0.5,
+      "complexity_raw": 2,
+      "complexity_norm": 0.5,
+      "coverage_gap": 0.75,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "target_path": "C:\\Users\\abhishekb3\\AppData\\Local\\Temp\\pytest-of-abhishekb3\\pytest-10\\test_simple_engine_runs_full_p0\\target_repo\\tests\\test_generated_risky.py",
+    "reviewer": "test-reviewer",
+    "trace_id": "386891bd1ffb49999a4da1ea6d2e4f1e"
+  }
+]

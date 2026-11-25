@@ -1,11 +1,11 @@
-"""Command-line entrypoint.
+"""Command-line entrypoint. Run from the project root (test-risk-agent/):
 
-    python -m test_risk_agent.cli baseline   # produce the input coverage.json
-    python -m test_risk_agent.cli analyze    # analyze -> rank -> generate, pause for review
-    python -m test_risk_agent.cli review     # interactive approve / edit / reject queue
-    python -m test_risk_agent.cli apply      # resume: write approved tests, coverage delta, report
-    python -m test_risk_agent.cli status     # review queue counts
-    python -m test_risk_agent.cli report     # print the latest run report
+    python cli.py baseline   # produce the input coverage.json
+    python cli.py analyze    # analyze -> rank -> generate, pause for review
+    python cli.py review     # interactive approve / edit / reject queue
+    python cli.py apply      # resume: write approved tests, coverage delta, report
+    python cli.py status     # review queue counts
+    python cli.py report     # print the latest run report
 
 See README.md for the full walkthrough.
 """
@@ -20,18 +20,18 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from . import coverage_delta as coverage_delta_mod
-from . import pipeline
-from . import review_queue
-from .config import (
+from workflow import coverage_delta as coverage_delta_mod
+from workflow import pipeline
+from review import review_queue
+from core.config import (
     AUDIT_LOG_PATH,
     PROJECT_ROOT,
     REPORTS_DIR,
     ensure_data_dirs,
     load_risk_weights,
 )
-from .models import TestDraft
-from .reporting import render_draft_outcomes, render_risk_table
+from core.models import TestDraft
+from workflow.reporting import render_draft_outcomes, render_risk_table
 
 DEFAULT_TARGET_REPO = PROJECT_ROOT / "sample_target_repo"
 
@@ -112,7 +112,7 @@ def cmd_analyze(args: argparse.Namespace) -> None:
     print(f"Running analyze -> rank -> generate (engine={engine}) ...")
 
     if engine == "langgraph":
-        from . import graph as graph_mod
+        from workflow import langgraph_orchestrator as graph_mod
 
         with graph_mod.sqlite_checkpointer_cm() as checkpointer:
             app = graph_mod.compiled_app(checkpointer)
@@ -204,7 +204,7 @@ def cmd_apply(args: argparse.Namespace) -> None:
     if engine == "langgraph":
         from langgraph.types import Command
 
-        from . import graph as graph_mod
+        from workflow import langgraph_orchestrator as graph_mod
 
         with graph_mod.sqlite_checkpointer_cm() as checkpointer:
             app = graph_mod.compiled_app(checkpointer)
@@ -253,7 +253,7 @@ def cmd_report(_args: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="test_risk_agent", description=__doc__)
+    parser = argparse.ArgumentParser(prog="cli.py", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_baseline = sub.add_parser("baseline", help="run pytest+coverage to produce the input coverage.json")

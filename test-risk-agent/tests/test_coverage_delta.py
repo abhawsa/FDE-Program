@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from test_risk_agent import coverage_delta
+from workflow import coverage_delta
 
 
 def _make_tiny_project(root: Path) -> None:

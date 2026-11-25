@@ -1,76 +1,114 @@
 # AI Test Coverage & Regression Risk Agent
 
-Ranks untested code paths by **change frequency x complexity x coverage
-gap** (not coverage gap alone), drafts candidate pytest tests for the
-riskiest ones, and requires a human to approve, edit, or reject every
-single draft before it ever touches the real test suite. Nothing auto-merges.
-
 > **Data privacy note:** everything this repo analyzes is synthetic demo
 > data (`sample_target_repo/`) created specifically for this exercise. Do
-> not point it at real production code containing customer or confidential
-> data without your own review of these privacy requirements.
+> not point it at real production, customer, or confidential code without
+> your own review of your organization's data-handling requirements.
 
-## Why this exists
+## Project Overview
 
 Coverage reports tell you *where* the gaps are, not which ones matter. A
 rarely-touched utility function and a payment-calculation branch that
 changes every sprint look identical on a coverage report - but only one of
-them is likely to cause the next regression. This agent combines three
-signals so the riskiest gaps surface first:
+them is likely to cause the next regression.
 
-```
-risk_score = w1 * normalize(log(change_frequency))
-           + w2 * normalize(log(cyclomatic_complexity))
-           + w3 * coverage_gap                      # already in [0, 1]
-```
+This agent analyzes git diff history and a `coverage.py` report together,
+ranks untested code paths by **risk = change frequency x complexity x
+coverage gap** (never coverage gap alone), and drafts candidate pytest
+tests for the highest-risk paths. A human explicitly **approves, edits, or
+rejects** every single draft before it is written to the test suite -
+nothing auto-merges. Every generation call and every review decision is
+traced (LangFuse) and logged to an append-only audit trail linking the
+test back to its risk score and its reviewer.
 
-## Architecture
+Reference result from the included demo (`sample_target_repo/`, a
+synthetic storefront with deliberately uneven git history and coverage):
+the agent ranked `billing/discounts.py::apply_discount` (changed 4x,
+cyclomatic complexity 3, 100% uncovered) as the #1 risk - above every
+other function with the same 100% coverage gap but far less churn. After
+human review (4 drafts edited with real assertions and approved, 2
+rejected as lower priority), overall coverage went **23.9% -> 93.5%**,
+counted only from the approved tests.
+
+## Architecture Description
+
+![Architecture diagram](docs/architecture.png)
 
 ```
  git history ─┐
-              ├─▶ analyze ─▶ rank ─▶ generate ─▶ human_review ─▶ apply ─▶ coverage_delta ─▶ report
- coverage.json┘                        │             │              │
-                                   LangFuse       (interrupt,    only approved/
-                                    traces         on-disk       edited drafts
-                                                   review         ever written
-                                                   queue)         to tests_dir
+              ├─▶ agents/history_analyzer.py ──┐
+ coverage.json┤   agents/coverage_parser.py     ├─▶ agents/risk_ranker.py ─▶ agents/test_generator.py
+ risk_weights ┘   (+ agents/complexity.py)     ┘        (risk_score)           (LLM + low_value_detector)
+                                                                                        │
+                                                                              LangFuse traces every call
+                                                                                        │
+                                                                                        ▼
+            workflow/langgraph_orchestrator.py  -  LangGraph StateGraph:
+            analyze -> rank -> generate -> human_review -> apply -> coverage_delta -> report
+                                     (interrupt() + SqliteSaver checkpoint)
+                                                        │
+                                                        ▼
+            review/review_queue.py  -  HUMAN REVIEW GATE: approve / edit / reject
+                                      (nothing auto-merges; rejected/pending never written anywhere)
+                                                        │
+                                                        ▼
+            review/apply_tests.py  -  writes ONLY approved/edited drafts, conflict-safe
+                                                        │
+                              ┌─────────────────────────┴─────────────────────────┐
+                              ▼                                                    ▼
+          sample_target_repo/tests/test_generated_*.py          workflow/coverage_delta.py -> report
+                                                        │
+                                                        ▼
+                      audit/audit_log.py -> audit/generation_audit_log.json
+                      (every draft <-> its risk score <-> its reviewer)
 ```
 
-Orchestrated as a **LangGraph** `StateGraph` (`src/test_risk_agent/graph.py`)
-with a genuine human-in-the-loop pause: the `human_review` node calls
-`interrupt()`, backed by a SQLite checkpointer, so the pipeline really stops
-- across separate CLI invocations/process runs - until a human has acted.
+Orchestrated as a **LangGraph** `StateGraph` with a genuine human-in-the-loop
+pause: the `human_review` node calls `interrupt()`, backed by a SQLite
+checkpointer, so the pipeline really stops - across separate CLI
+invocations / process runs - until a human has acted via `review`. Every
+pipeline step is also a plain Python function in `workflow/pipeline.py`, so
+the exact same logic runs through a dependency-free sequential engine if
+`langgraph` isn't installed (`--engine simple`, or automatic fallback).
+Both engines are covered by the test suite.
 
-Every pipeline step is also a plain Python function in
-`src/test_risk_agent/pipeline.py`, so the exact same logic runs through a
-**dependency-free sequential engine** if `langgraph` isn't installed
-(`--engine simple`, or automatic fallback). Both engines are tested.
-
-## Project layout
+### Project layout
 
 ```
-src/test_risk_agent/
-  analyzer.py          # walks source files, ties git history + coverage + complexity together
-  git_history.py        # change-frequency via `git` CLI (no GitPython dependency)
-  complexity.py          # AST-based function discovery + cyclomatic complexity
-  coverage_ingest.py     # parses `coverage json` reports, maps lines -> functions
-  risk_ranker.py         # combines the three signals into one score
-  test_generator.py      # drafts pytest tests (LLM, with an honest template fallback)
-  low_value_detector.py  # flags drafts with no real assertions
-  review_queue.py        # the human review gate (on-disk JSON queue)
-  apply_tests.py         # writes ONLY approved/edited drafts to the test suite
-  coverage_delta.py      # re-runs coverage, reports the improvement
-  audit_log.py           # append-only log: every draft <-> its risk score <-> its reviewer
-  tracing.py             # LangFuse wrapper (safe no-op if not configured)
-  pipeline.py            # the step functions, shared by both engines
-  graph.py               # LangGraph wiring (StateGraph + interrupt + SqliteSaver)
-  cli.py                 # `python -m test_risk_agent.cli ...`
-sample_target_repo/      # synthetic seed repo used for the demo (see its own README)
-tests/                   # 53 unit/integration tests for the agent itself
-config/risk_weights.yaml # tune the three risk weights
+README.md              DECISIONS.md             .env.example
+cli.py                  pytest.ini               conftest.py
+core/                   # shared infrastructure
+  config.py               paths, .env loading, Settings, RiskWeights
+  models.py               FunctionSpan / RiskCandidate / TestDraft dataclasses
+  tracing.py              LangFuse wrapper (safe no-op if unconfigured)
+agents/                 # Diff & History Analyzer, Coverage Ingestion, Risk Ranking, Test Draft Generator
+  history_analyzer.py     change-frequency via `git` CLI, matched per-commit (no GitPython)
+  coverage_parser.py      parses `coverage json`, maps missing lines -> functions
+  complexity.py           AST-based function discovery + cyclomatic complexity
+  repo_scanner.py         ties the three together into RiskCandidates
+  risk_ranker.py          combines change_frequency x complexity x coverage_gap -> risk_score
+  test_generator.py       drafts pytest tests (LLM, with an honest template fallback)
+  llm_client.py           thin Anthropic wrapper
+  low_value_detector.py   flags drafts with no real assertions
+workflow/               # LangGraph orchestration
+  langgraph_orchestrator.py   StateGraph + interrupt() + SqliteSaver
+  pipeline.py                 shared step functions (both engines)
+  coverage_delta.py           re-runs coverage, reports the improvement
+  reporting.py                renders the Markdown/JSON run report
+review/                 # Human Review Gate
+  review_queue.py          on-disk JSON queue: approve / edit / reject
+  apply_tests.py            writes ONLY approved/edited drafts, conflict-safe
+audit/                  # Audit trail
+  audit_log.py              append-only JSONL + JSON-array export
+  generation_audit_log.json populated snapshot from the reference run
+docs/
+  architecture.png
+sample_target_repo/    # synthetic seed repo used for the demo (see its own README)
+tests/                  # 53 unit/integration tests for the agent itself
+config/risk_weights.yaml
 ```
 
-## Setup
+## Setup Instructions
 
 ```bash
 cd test-risk-agent
@@ -80,129 +118,124 @@ pip install -r requirements.txt
 cp .env.example .env                # fill in keys below if you have them - all optional
 ```
 
-### Environment variables (`.env`, all optional)
+Requires Python 3.10+ and `git` on PATH. Verify your setup with the agent's
+own test suite:
+
+```bash
+pytest   # 53 tests, ~1-2 min
+```
+
+## Environment Variables
+
+All variables are **optional** - the agent runs end-to-end with none of
+them set, using safe local fallbacks. Copy `.env.example` to `.env` and
+fill in what you have; never commit the real `.env` (already in
+`.gitignore`).
 
 | Variable | Purpose | If unset |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | Lets Claude draft real test bodies | Falls back to an honest, clearly-labeled TODO template (never a fake passing test) |
 | `ANTHROPIC_MODEL` | Model id (default `claude-sonnet-5`) | uses default |
-| `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` | Traces every generation call + review decision | Tracing becomes a safe no-op |
+| `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` | Traces every generation call + review decision | Tracing becomes a safe no-op (pipeline still runs) |
 | `LANGFUSE_HOST` | Self-hosted LangFuse | defaults to LangFuse Cloud |
 | `RISK_LOOKBACK_DAYS` / `RISK_TOP_N` | Tuning | 180 days / top 10 |
 
-Never commit `.env` - it's already in `.gitignore`.
+## How to Run the Risk Analysis
 
-## Quickstart walkthrough
-
-All commands assume `cd test-risk-agent && source .venv/Scripts/activate`.
+All commands run from `test-risk-agent/` with the venv active.
 
 ```bash
 # 1. Produce the input coverage report for the seed repo
-python -m test_risk_agent.cli baseline
+python cli.py baseline
 
-# 2. Analyze -> rank -> generate candidate tests, then pause for review
-python -m test_risk_agent.cli analyze
-
-# 3. Interactively approve / edit / reject each draft
-python -m test_risk_agent.cli review
-
-# 4. Resume: write approved/edited tests to the suite, measure the coverage
-#    delta, and write the final report
-python -m test_risk_agent.cli apply
-
-# Anytime: check queue counts, or re-print the last report
-python -m test_risk_agent.cli status
-python -m test_risk_agent.cli report
+# 2. Analyze git history + coverage.json -> rank -> draft candidate tests,
+#    then pause for human review
+python cli.py analyze
 ```
 
-Example output from a real run against `sample_target_repo` (see
-`data/reports/latest_report.md` after you run it yourself):
+`analyze` prints the risk-ranked table (file, function, risk score, change
+frequency, complexity, coverage gap) and the list of drafted candidates,
+then pauses - nothing is written to the test suite yet. Useful flags:
+`--repo-root`, `--coverage-json`, `--lookback-days`, `--top-n`,
+`--engine {auto,langgraph,simple}` (default `auto`: uses LangGraph if
+installed, otherwise the dependency-free engine).
 
-| Rank | Function | Risk Score | Change Freq | Complexity | Coverage Gap |
-|---|---|---|---|---|---|
-| 1 | `billing/discounts.py::apply_discount` | 0.927 | 4 | 3 | 100% |
-| 2 | `billing/discounts.py::bulk_discount_rate` | 0.777 | 2 | 4 | 100% |
-| 3 | `billing/discounts.py::coupon_discount_rate` | 0.610 | 2 | 2 | 100% |
-| 4 | `inventory/stock.py::reorder_point` | 0.527 | 1 | 3 | 100% |
-| 5 | `billing/calculator.py::calculate_total` | 0.313 | 1 | 3 | 29% |
-| 6 | `inventory/stock.py::is_low_stock` | 0.300 | 1 | 1 | 100% |
+## How to Review/Approve Generated Tests
 
-`billing/discounts.py` dominates the top of the ranking even though every
-function above has a 100% coverage gap, because it is also the
-highest-change-frequency, highest-complexity file - exactly the scenario
-from the problem statement where a naive "largest coverage gap" sort would
-have missed the actual regression risk.
+```bash
+python cli.py review
+```
 
-After `review` + `apply` in that same run: 4 drafts were edited (by the
-reviewer, adding real expected-value assertions) and applied, 2 were
-rejected as lower priority, and overall coverage on the seed repo went from
-**23.9% -> 93.5%** - counted only from the approved/edited tests, never the
-rejected ones.
+For each pending draft this shows: the file/function, its risk score and
+rationale, the full generated test code, and any **low-value warning**
+(e.g. "only verifies that an exception is raised, without checking its
+type/message" or "body is an empty TODO stub"). You then choose:
 
-## Key features (mapped to the spec)
+- **`a` approve** - use the draft as-is
+- **`e` edit** - opens the draft in a temp file for you to rewrite, then
+  re-runs the low-value check on your edit before saving
+- **`r` reject** - recorded with your reason, never written anywhere
+- **`s` skip** - leave pending for a later review session
 
-| Feature | Where |
-|---|---|
-| Risk-ranked untested path report | `risk_ranker.py`, `reporting.render_risk_table` |
-| Candidate test generation (pytest) | `test_generator.py` |
-| Human review queue (approve/edit/reject) | `review_queue.py`, `cli.py review` |
-| Coverage delta (approved tests only) | `coverage_delta.py` - `apply_tests.py` only ever writes approved/edited drafts to disk, so re-running coverage afterwards measures exactly that |
-| Low-value test detection | `low_value_detector.py` - AST-based, flags empty stubs, "no real assertion" tests, and bare `pytest.raises` with no message/state check |
-| CI integration hook | `coverage_delta.run_coverage()` is a plain subprocess call to `pytest`/`coverage`; wire it into your CI step of choice to confirm applied tests still pass before merge |
-| Audit trail | `audit_log.py` - append-only JSONL, every entry carries `risk_score` + `risk_components` + `reviewer` |
+`python cli.py status` shows queue counts at any time. Once every draft
+has a decision, finalize the run:
 
-## Anti-patterns this deliberately avoids
+```bash
+python cli.py apply
+```
 
-- **Never auto-merges**: `apply_tests.py` only writes drafts whose status
-  is `approved` or `edited`; `pending`/`rejected` drafts are never written
-  anywhere outside the review queue.
-- **Never ranks by coverage gap alone**: every candidate in the demo above
-  has a 100% coverage gap, yet they're ranked by change-frequency and
-  complexity too (see `test_risk_ranker.py::test_high_change_frequency_outranks_coverage_gap_alone`).
-- **Never silently overwrites existing tests**: `apply_tests.py` refuses to
-  overwrite a pre-existing file with different content; it reports a
-  conflict for manual resolution instead.
-- **Flags its own low-value output**: the no-LLM-key fallback honestly
-  produces a TODO stub (never a fabricated passing assertion), and the
-  low-value detector runs on every draft - LLM-written or template - before
-  it reaches the reviewer.
-- **Audit trail always present**: every draft and every review decision is
-  logged with its risk score and components, not just a pass/fail.
+This resumes the paused LangGraph run (or the simple-engine state),
+writes **only** approved/edited drafts into `sample_target_repo/tests/`
+(flagging - never overwriting - any filename conflict with existing
+content), re-runs coverage, and writes the final report to
+`data/reports/latest_report.md`.
 
-## Where this still needs a human
+## How to Inspect AI Decisions (Audit Log + LangFuse)
+
+Every test-generation call and every review decision is recorded twice:
+
+1. **Audit log** - `data/audit_log.jsonl` (append-only, written live) and
+   `audit/generation_audit_log.json` (a pretty-printed JSON-array snapshot
+   refreshed on every `apply`). Each entry carries the draft id, file,
+   function, **risk_score and its full risk_components breakdown**, the
+   decision (`edit`/`approve`/`reject`), the reviewer, and - if LangFuse is
+   configured - the `trace_id` to cross-reference. See `DECISIONS.md` for
+   the narrative version of the reference run's decisions.
+2. **LangFuse** - set `LANGFUSE_PUBLIC_KEY`/`LANGFUSE_SECRET_KEY` in `.env`
+   (free tier at [cloud.langfuse.com](https://cloud.langfuse.com)) and every
+   call to `agents/test_generator.py::generate_draft` opens a trace/span
+   with the candidate's file, qualname, risk score, and components as
+   metadata, plus the generated code and whether it was LLM- or
+   template-generated as output - open the LangFuse dashboard and filter by
+   trace name `test_generation`. Without keys set, `core/tracing.py`
+   degrades to a safe no-op (confirmed by `tests/test_config.py` and the
+   generator tests) so the pipeline never depends on LangFuse being present.
+
+## Known Limitations
 
 - **Test intent vs. current behavior**: an LLM- or human-drafted test can
   assert the code's *current* (possibly buggy) behavior instead of its
   *correct* behavior. Review the rationale and the function source, not
-  just whether the draft passes.
+  just whether the draft passes - this is called out directly in each
+  draft's low-value check, but is not something static analysis alone can
+  catch.
 - **Risk scoring is a heuristic**, not a guarantee - it approximates where
-  regressions are likely.
-- **Change-frequency attribution is commit-overlap based**: a function
-  rename is treated as a brand-new function with no history (see
-  `git_history.py` docstring). A module-level constant edit (e.g. adding a
-  dict entry outside any function body) correctly does **not** count
-  toward a function's change frequency, even if it changes that function's
-  behavior.
-
-## Running the agent's own test suite
-
-```bash
-cd test-risk-agent
-source .venv/Scripts/activate
-pytest           # 53 tests: complexity, risk ranking, coverage parsing,
-                 # low-value detection, review queue, apply/conflict
-                 # handling, real git-history fixtures, both orchestration
-                 # engines, and a real coverage.py subprocess round-trip
-```
-
-## Engines
-
-| | `--engine langgraph` (default if installed) | `--engine simple` |
-|---|---|---|
-| Dependency | `langgraph` + `langgraph-checkpoint-sqlite` | stdlib only |
-| Pause mechanism | `interrupt()` + SQLite checkpoint, survives across CLI invocations | a JSON state file (`data/simple_pipeline_state.json`) |
-| Review step | identical - operates on the on-disk review queue either way | identical |
-
-`--engine auto` (the CLI default) picks `langgraph` if it's importable,
-otherwise `simple` - so the tool still runs end-to-end even in an
-environment where you can't install LangGraph.
+  regressions are likely. The weighting in `config/risk_weights.yaml` is a
+  starting point (see `DECISIONS.md` for the reasoning); teams with a
+  different regression profile should retune it.
+- **Change-frequency attribution is commit-overlap based**: for each
+  commit, function spans are re-parsed from that commit's own blob and
+  matched by qualified name to today's functions, which avoids line-number
+  drift but still treats a renamed function as brand-new with no prior
+  history. A module-level constant edit (e.g. adding a dict entry outside
+  any function body) correctly does **not** count toward a function's
+  change frequency, even when it changes that function's behavior.
+- **No `--branch` selection yet**: analysis always runs against whatever is
+  currently checked out in `--repo-root`; to analyze a different branch,
+  check it out first.
+- **Low-value detection is heuristic, not semantic**: it checks for the
+  *shape* of a test (real comparisons vs. trivial/empty assertions), not
+  whether the assertions are actually correct.
+- **`apply` re-runs the whole target-repo test suite via subprocess** to
+  compute the coverage delta; on a very large real repo this is the
+  dominant cost of a run, not the agent's own analysis.

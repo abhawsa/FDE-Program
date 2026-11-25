@@ -10,9 +10,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, List
 
-from . import audit_log
-from . import review_queue
-from .models import TestDraft
+from audit import audit_log
+from review import review_queue
+from core.models import TestDraft
 
 APPLIED_STATUSES = {"approved", "edited"}
 

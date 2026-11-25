@@ -12,8 +12,8 @@ from typing import Optional
 
 import yaml
 
-# test-risk-agent/src/test_risk_agent/config.py -> parents[2] == test-risk-agent/
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+# test-risk-agent/core/config.py -> parents[1] == test-risk-agent/
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
 REVIEW_QUEUE_DIR = DATA_DIR / "review_queue"
 REPORTS_DIR = DATA_DIR / "reports"

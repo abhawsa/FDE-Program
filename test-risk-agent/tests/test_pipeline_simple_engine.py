@@ -12,7 +12,9 @@ from pathlib import Path
 
 import pytest
 
-from test_risk_agent import audit_log, pipeline, review_queue
+from audit import audit_log
+from workflow import pipeline
+from review import review_queue
 
 
 def _git(args, cwd: Path):

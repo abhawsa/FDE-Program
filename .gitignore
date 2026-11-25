@@ -40,3 +40,6 @@ target/
 
 # Misc
 .cache/
+
+# Build artifacts (submission zips etc.)
+*.zip

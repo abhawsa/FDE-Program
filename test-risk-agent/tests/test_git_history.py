@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from test_risk_agent import git_history
-from test_risk_agent.complexity import extract_function_spans
+from agents import history_analyzer as git_history
+from agents.complexity import extract_function_spans
 
 
 def _git(args, cwd: Path):

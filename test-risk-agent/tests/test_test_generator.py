@@ -1,6 +1,6 @@
-from test_risk_agent import test_generator
-from test_risk_agent.config import Settings
-from test_risk_agent.models import FunctionSpan, RiskCandidate
+from agents import test_generator
+from core.config import Settings
+from core.models import FunctionSpan, RiskCandidate
 
 
 def _candidate_and_span():

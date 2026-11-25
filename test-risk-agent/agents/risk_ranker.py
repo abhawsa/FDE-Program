@@ -10,8 +10,8 @@ from __future__ import annotations
 import math
 from typing import List
 
-from .config import RiskWeights
-from .models import RiskCandidate
+from core.config import RiskWeights
+from core.models import RiskCandidate
 
 
 def _minmax_normalize(values: List[float]) -> List[float]:

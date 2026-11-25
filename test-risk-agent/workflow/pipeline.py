@@ -19,15 +19,16 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
-from . import analyzer
-from . import apply_tests
-from . import coverage_delta as coverage_delta_mod
-from . import reporting
-from . import review_queue
-from . import risk_ranker
-from . import test_generator
-from .config import DATA_DIR, RiskWeights, Settings, ensure_data_dirs
-from .models import FunctionSpan, RiskCandidate, TestDraft
+from agents import repo_scanner as analyzer
+from agents import risk_ranker
+from agents import test_generator
+from audit import audit_log
+from review import apply_tests
+from review import review_queue
+from workflow import coverage_delta as coverage_delta_mod
+from workflow import reporting
+from core.config import DATA_DIR, RiskWeights, Settings, ensure_data_dirs
+from core.models import FunctionSpan, RiskCandidate, TestDraft
 
 SIMPLE_STATE_PATH = DATA_DIR / "simple_pipeline_state.json"
 
@@ -118,6 +119,7 @@ def step_report(state: Dict[str, Any]) -> Dict[str, Any]:
         ),
         encoding="utf-8",
     )
+    audit_log.export_json_array()
     return {"report_path": str(report_path)}
 
 

@@ -15,8 +15,8 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
-from . import pipeline
-from .config import CHECKPOINT_DB_PATH, ensure_data_dirs
+from workflow import pipeline
+from core.config import CHECKPOINT_DB_PATH, ensure_data_dirs
 
 
 class PipelineState(TypedDict, total=False):

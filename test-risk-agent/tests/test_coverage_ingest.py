@@ -3,12 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from test_risk_agent.coverage_ingest import (
+from agents.coverage_parser import (
     find_file_coverage,
     function_coverage_gap,
     load_coverage_json,
 )
-from test_risk_agent.models import FunctionSpan
+from core.models import FunctionSpan
 
 
 def _write_coverage_json(path: Path) -> None:

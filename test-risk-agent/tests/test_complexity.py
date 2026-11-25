@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from test_risk_agent.complexity import cyclomatic_complexity, extract_function_spans
+from agents.complexity import cyclomatic_complexity, extract_function_spans
 import ast
 
 

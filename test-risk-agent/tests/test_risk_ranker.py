@@ -1,6 +1,6 @@
-from test_risk_agent.config import RiskWeights
-from test_risk_agent.models import RiskCandidate
-from test_risk_agent.risk_ranker import rank_candidates
+from core.config import RiskWeights
+from core.models import RiskCandidate
+from agents.risk_ranker import rank_candidates
 
 
 def _candidate(**overrides) -> RiskCandidate:

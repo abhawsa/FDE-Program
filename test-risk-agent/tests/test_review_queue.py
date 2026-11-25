@@ -2,8 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from test_risk_agent import audit_log, review_queue
-from test_risk_agent.models import TestDraft, new_draft_id
+from audit import audit_log
+from review import review_queue
+from core.models import TestDraft, new_draft_id
 
 
 @pytest.fixture(autouse=True)

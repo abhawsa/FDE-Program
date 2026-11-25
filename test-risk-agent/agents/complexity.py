@@ -10,7 +10,7 @@ import ast
 from pathlib import Path
 from typing import List, Optional
 
-from .models import FunctionSpan
+from core.models import FunctionSpan
 
 _LINEAR_DECISION_NODES = (
     ast.If,

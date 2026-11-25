@@ -1,4 +1,4 @@
-from test_risk_agent.low_value_detector import evaluate_test_code
+from agents.low_value_detector import evaluate_test_code
 
 
 def test_flags_empty_todo_stub():

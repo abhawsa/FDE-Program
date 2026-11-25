@@ -11,11 +11,11 @@ import re
 import textwrap
 from typing import Optional
 
-from . import llm_client
-from . import low_value_detector
-from .config import Settings
-from .models import FunctionSpan, RiskCandidate, TestDraft, new_draft_id
-from .tracing import tracer
+from agents import llm_client
+from agents import low_value_detector
+from core.config import Settings
+from core.models import FunctionSpan, RiskCandidate, TestDraft, new_draft_id
+from core.tracing import tracer
 
 _PROMPT_TEMPLATE = """You are a senior Python test engineer adding a missing pytest test to an \
 existing suite. The suite uses plain pytest (no unittest.TestCase), already imports fixtures \

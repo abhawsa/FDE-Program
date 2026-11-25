@@ -6,7 +6,7 @@ fall back to a template draft instead of guessing or pretending.
 """
 from __future__ import annotations
 
-from .config import Settings
+from core.config import Settings
 
 
 class LLMUnavailable(Exception):

@@ -8,10 +8,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Iterable, List, Tuple
 
-from . import complexity as complexity_mod
-from . import coverage_ingest
-from . import git_history
-from .models import FunctionSpan, RiskCandidate
+from agents import complexity as complexity_mod
+from agents import coverage_parser as coverage_ingest
+from agents import history_analyzer as git_history
+from core.models import FunctionSpan, RiskCandidate
 
 DEFAULT_EXCLUDE_DIR_NAMES = frozenset(
     {"tests", "test", ".venv", "venv", "__pycache__", ".git", "build", "dist"}

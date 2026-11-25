@@ -11,10 +11,10 @@ import time
 from pathlib import Path
 from typing import List, Optional
 
-from . import audit_log
-from . import low_value_detector
-from .config import REVIEW_QUEUE_DIR, ensure_data_dirs
-from .models import TestDraft
+from audit import audit_log
+from agents import low_value_detector
+from core.config import REVIEW_QUEUE_DIR, ensure_data_dirs
+from core.models import TestDraft
 
 VALID_DECISIONS = {"approve", "edit", "reject"}
 

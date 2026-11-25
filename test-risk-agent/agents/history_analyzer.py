@@ -21,8 +21,8 @@ import subprocess
 from pathlib import Path
 from typing import Dict, Iterable, List, Tuple
 
-from .complexity import extract_function_spans
-from .models import FunctionSpan
+from agents.complexity import extract_function_spans
+from core.models import FunctionSpan
 
 _HUNK_RE = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 
