@@ -1,20 +1,124 @@
 [
   {
-    "timestamp": 1795606274.8214266,
+    "timestamp": 1795605769.609021,
     "event": "review_decision",
-    "draft_id": "draft_f2bf5ab7ce22",
-    "decision": "approve",
-    "reviewer": "test-reviewer",
-    "comment": null,
-    "file": "pkg/mod.py",
-    "qualname": "risky",
-    "risk_score": 0.575,
+    "draft_id": "draft_26fb71554785",
+    "decision": "edit",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Replaced the TODO stub with real assertions covering the risky branches",
+    "file": "billing/discounts.py",
+    "qualname": "apply_discount",
+    "risk_score": 0.9269,
+    "risk_components": {
+      "change_frequency_raw": 4,
+      "change_frequency_norm": 1.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": false,
+    "low_value_reasons": [],
+    "trace_id": "bf692992b87d48e2852d8ddcc709dda4"
+  },
+  {
+    "timestamp": 1795605769.6293323,
+    "event": "review_decision",
+    "draft_id": "draft_8b06f492fc9b",
+    "decision": "edit",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Replaced the TODO stub with real assertions covering the risky branches",
+    "file": "billing/discounts.py",
+    "qualname": "bulk_discount_rate",
+    "risk_score": 0.777,
+    "risk_components": {
+      "change_frequency_raw": 2,
+      "change_frequency_norm": 0.4425,
+      "complexity_raw": 4,
+      "complexity_norm": 1.0,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": false,
+    "low_value_reasons": [],
+    "trace_id": "9bd85e8f1cd744ee8c0927ab76a5dbc3"
+  },
+  {
+    "timestamp": 1795605769.6478238,
+    "event": "review_decision",
+    "draft_id": "draft_4cc248e54759",
+    "decision": "edit",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Replaced the TODO stub with real assertions covering the risky branches",
+    "file": "billing/discounts.py",
+    "qualname": "coupon_discount_rate",
+    "risk_score": 0.6098,
+    "risk_components": {
+      "change_frequency_raw": 2,
+      "change_frequency_norm": 0.4425,
+      "complexity_raw": 2,
+      "complexity_norm": 0.4425,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": false,
+    "low_value_reasons": [],
+    "trace_id": "6f0f11053bf845519fd7d391517582c8"
+  },
+  {
+    "timestamp": 1795605769.6609218,
+    "event": "review_decision",
+    "draft_id": "draft_f2141a76f2d2",
+    "decision": "edit",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Replaced the TODO stub with real assertions covering the risky branches",
+    "file": "inventory/stock.py",
+    "qualname": "reorder_point",
+    "risk_score": 0.5269,
     "risk_components": {
       "change_frequency_raw": 1,
-      "change_frequency_norm": 0.5,
-      "complexity_raw": 2,
-      "complexity_norm": 0.5,
-      "coverage_gap": 0.75,
+      "change_frequency_norm": 0.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": false,
+    "low_value_reasons": [],
+    "trace_id": "93920e6330144b118ad99c297fd73636"
+  },
+  {
+    "timestamp": 1795605769.6780486,
+    "event": "review_decision",
+    "draft_id": "draft_8a0efb7fc4c2",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "lower risk this sprint; existing happy-path test already covers most of it",
+    "file": "billing/calculator.py",
+    "qualname": "calculate_total",
+    "risk_score": 0.3127,
+    "risk_components": {
+      "change_frequency_raw": 1,
+      "change_frequency_norm": 0.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 0.2857,
       "weights": {
         "change_frequency": 0.4,
         "complexity": 0.3,
@@ -23,31 +127,464 @@
     },
     "low_value": true,
     "low_value_reasons": [
-      "test_risky_todo_needs_review: body is an empty TODO stub with no executable assertions"
+      "test_calculate_total_todo_needs_review: body is an empty TODO stub with no executable assertions"
     ],
-    "trace_id": "386891bd1ffb49999a4da1ea6d2e4f1e"
+    "trace_id": "fd7e15457ec147efabb962ed610898a7"
   },
   {
-    "timestamp": 1795606274.8487804,
-    "event": "test_applied",
-    "draft_id": "draft_f2bf5ab7ce22",
-    "file": "pkg/mod.py",
-    "qualname": "risky",
-    "risk_score": 0.575,
+    "timestamp": 1795605769.702993,
+    "event": "review_decision",
+    "draft_id": "draft_6a7209c70036",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "trivial one-liner, not worth a generated test right now",
+    "file": "inventory/stock.py",
+    "qualname": "is_low_stock",
+    "risk_score": 0.3,
     "risk_components": {
       "change_frequency_raw": 1,
-      "change_frequency_norm": 0.5,
-      "complexity_raw": 2,
-      "complexity_norm": 0.5,
-      "coverage_gap": 0.75,
+      "change_frequency_norm": 0.0,
+      "complexity_raw": 1,
+      "complexity_norm": 0.0,
+      "coverage_gap": 1.0,
       "weights": {
         "change_frequency": 0.4,
         "complexity": 0.3,
         "coverage_gap": 0.3
       }
     },
-    "target_path": "C:\\Users\\abhishekb3\\AppData\\Local\\Temp\\pytest-of-abhishekb3\\pytest-10\\test_simple_engine_runs_full_p0\\target_repo\\tests\\test_generated_risky.py",
-    "reviewer": "test-reviewer",
-    "trace_id": "386891bd1ffb49999a4da1ea6d2e4f1e"
+    "low_value": true,
+    "low_value_reasons": [
+      "test_is_low_stock_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "b0a7ffc70a024acda514d23b28b5f848"
+  },
+  {
+    "timestamp": 1795605788.205245,
+    "event": "test_applied",
+    "draft_id": "draft_26fb71554785",
+    "file": "billing/discounts.py",
+    "qualname": "apply_discount",
+    "risk_score": 0.9269,
+    "risk_components": {
+      "change_frequency_raw": 4,
+      "change_frequency_norm": 1.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "target_path": "C:\\Users\\abhishekb3\\Desktop\\AI Learning\\FDE Program\\Learning Project\\my-learning-repo\\test-risk-agent\\sample_target_repo\\tests\\test_generated_apply_discount.py",
+    "reviewer": "Abhishek Bhawsar",
+    "trace_id": "bf692992b87d48e2852d8ddcc709dda4"
+  },
+  {
+    "timestamp": 1795605788.22147,
+    "event": "test_applied",
+    "draft_id": "draft_8b06f492fc9b",
+    "file": "billing/discounts.py",
+    "qualname": "bulk_discount_rate",
+    "risk_score": 0.777,
+    "risk_components": {
+      "change_frequency_raw": 2,
+      "change_frequency_norm": 0.4425,
+      "complexity_raw": 4,
+      "complexity_norm": 1.0,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "target_path": "C:\\Users\\abhishekb3\\Desktop\\AI Learning\\FDE Program\\Learning Project\\my-learning-repo\\test-risk-agent\\sample_target_repo\\tests\\test_generated_bulk_discount_rate.py",
+    "reviewer": "Abhishek Bhawsar",
+    "trace_id": "9bd85e8f1cd744ee8c0927ab76a5dbc3"
+  },
+  {
+    "timestamp": 1795605788.248576,
+    "event": "test_applied",
+    "draft_id": "draft_4cc248e54759",
+    "file": "billing/discounts.py",
+    "qualname": "coupon_discount_rate",
+    "risk_score": 0.6098,
+    "risk_components": {
+      "change_frequency_raw": 2,
+      "change_frequency_norm": 0.4425,
+      "complexity_raw": 2,
+      "complexity_norm": 0.4425,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "target_path": "C:\\Users\\abhishekb3\\Desktop\\AI Learning\\FDE Program\\Learning Project\\my-learning-repo\\test-risk-agent\\sample_target_repo\\tests\\test_generated_coupon_discount_rate.py",
+    "reviewer": "Abhishek Bhawsar",
+    "trace_id": "6f0f11053bf845519fd7d391517582c8"
+  },
+  {
+    "timestamp": 1795605788.2676282,
+    "event": "test_applied",
+    "draft_id": "draft_f2141a76f2d2",
+    "file": "inventory/stock.py",
+    "qualname": "reorder_point",
+    "risk_score": 0.5269,
+    "risk_components": {
+      "change_frequency_raw": 1,
+      "change_frequency_norm": 0.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "target_path": "C:\\Users\\abhishekb3\\Desktop\\AI Learning\\FDE Program\\Learning Project\\my-learning-repo\\test-risk-agent\\sample_target_repo\\tests\\test_generated_reorder_point.py",
+    "reviewer": "Abhishek Bhawsar",
+    "trace_id": "93920e6330144b118ad99c297fd73636"
+  },
+  {
+    "timestamp": 1795611283.9537804,
+    "event": "review_decision",
+    "draft_id": "draft_7bb1f5e777eb",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "billing/discounts.py",
+    "qualname": "apply_discount",
+    "risk_score": 0.9269,
+    "risk_components": {
+      "change_frequency_raw": 4,
+      "change_frequency_norm": 1.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_apply_discount_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "1d1a2a1c9e2830cc8edddebb1b5333c7"
+  },
+  {
+    "timestamp": 1795611283.9624174,
+    "event": "review_decision",
+    "draft_id": "draft_8c69be6328f6",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "billing/discounts.py",
+    "qualname": "apply_discount",
+    "risk_score": 0.9269,
+    "risk_components": {
+      "change_frequency_raw": 4,
+      "change_frequency_norm": 1.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_apply_discount_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "d3105057-659e-4080-8720-892426b2a247"
+  },
+  {
+    "timestamp": 1795611283.9707417,
+    "event": "review_decision",
+    "draft_id": "draft_1923a8ebd06b",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "billing/discounts.py",
+    "qualname": "bulk_discount_rate",
+    "risk_score": 0.777,
+    "risk_components": {
+      "change_frequency_raw": 2,
+      "change_frequency_norm": 0.4425,
+      "complexity_raw": 4,
+      "complexity_norm": 1.0,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_bulk_discount_rate_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "47c7f45f-6ef4-4bfa-bafb-74f764d70e6a"
+  },
+  {
+    "timestamp": 1795611283.9809668,
+    "event": "review_decision",
+    "draft_id": "draft_c78465808817",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "billing/discounts.py",
+    "qualname": "bulk_discount_rate",
+    "risk_score": 0.777,
+    "risk_components": {
+      "change_frequency_raw": 2,
+      "change_frequency_norm": 0.4425,
+      "complexity_raw": 4,
+      "complexity_norm": 1.0,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_bulk_discount_rate_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "3b879e3f2929c0e581590aa752c7e8a2"
+  },
+  {
+    "timestamp": 1795611283.9887776,
+    "event": "review_decision",
+    "draft_id": "draft_3b087da73def",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "billing/discounts.py",
+    "qualname": "coupon_discount_rate",
+    "risk_score": 0.6098,
+    "risk_components": {
+      "change_frequency_raw": 2,
+      "change_frequency_norm": 0.4425,
+      "complexity_raw": 2,
+      "complexity_norm": 0.4425,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_coupon_discount_rate_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "dbbf2c93-693b-474c-a11a-920247dce1c4"
+  },
+  {
+    "timestamp": 1795611283.9957874,
+    "event": "review_decision",
+    "draft_id": "draft_e05b852d66d0",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "billing/discounts.py",
+    "qualname": "coupon_discount_rate",
+    "risk_score": 0.6098,
+    "risk_components": {
+      "change_frequency_raw": 2,
+      "change_frequency_norm": 0.4425,
+      "complexity_raw": 2,
+      "complexity_norm": 0.4425,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_coupon_discount_rate_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "1f8ea0bace6f906f42f951bcaaf53484"
+  },
+  {
+    "timestamp": 1795611284.0057983,
+    "event": "review_decision",
+    "draft_id": "draft_8a9ea723836d",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "inventory/stock.py",
+    "qualname": "reorder_point",
+    "risk_score": 0.5269,
+    "risk_components": {
+      "change_frequency_raw": 1,
+      "change_frequency_norm": 0.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_reorder_point_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "570920a70bf351dfd6f585e8d62b2825"
+  },
+  {
+    "timestamp": 1795611284.014475,
+    "event": "review_decision",
+    "draft_id": "draft_9936e513675e",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "inventory/stock.py",
+    "qualname": "reorder_point",
+    "risk_score": 0.5269,
+    "risk_components": {
+      "change_frequency_raw": 1,
+      "change_frequency_norm": 0.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_reorder_point_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "4a7f24a7-4902-47dc-a8dd-74c20b466b7a"
+  },
+  {
+    "timestamp": 1795611284.0240202,
+    "event": "review_decision",
+    "draft_id": "draft_1fd4936b1071",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "billing/calculator.py",
+    "qualname": "calculate_total",
+    "risk_score": 0.3127,
+    "risk_components": {
+      "change_frequency_raw": 1,
+      "change_frequency_norm": 0.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 0.2857,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_calculate_total_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "d3c02fbe8443f92460e9cf9632116d54"
+  },
+  {
+    "timestamp": 1795611284.0331526,
+    "event": "review_decision",
+    "draft_id": "draft_fea3dffb7eb2",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "billing/calculator.py",
+    "qualname": "calculate_total",
+    "risk_score": 0.3127,
+    "risk_components": {
+      "change_frequency_raw": 1,
+      "change_frequency_norm": 0.0,
+      "complexity_raw": 3,
+      "complexity_norm": 0.7565,
+      "coverage_gap": 0.2857,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_calculate_total_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "431d9545-f353-4255-96f9-b4eb0c21c14e"
+  },
+  {
+    "timestamp": 1795611284.0401604,
+    "event": "review_decision",
+    "draft_id": "draft_6172d49eddd2",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "inventory/stock.py",
+    "qualname": "is_low_stock",
+    "risk_score": 0.3,
+    "risk_components": {
+      "change_frequency_raw": 1,
+      "change_frequency_norm": 0.0,
+      "complexity_raw": 1,
+      "complexity_norm": 0.0,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_is_low_stock_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "45e96ca4caa132a00a42bf2e292604c3"
+  },
+  {
+    "timestamp": 1795611284.048769,
+    "event": "review_decision",
+    "draft_id": "draft_ef9bee284754",
+    "decision": "reject",
+    "reviewer": "Abhishek Bhawsar",
+    "comment": "Superseded duplicate - this run was only to verify LangFuse tracing after fixing the SDK version; the original decision for this function already stands (see earlier audit entries).",
+    "file": "inventory/stock.py",
+    "qualname": "is_low_stock",
+    "risk_score": 0.3,
+    "risk_components": {
+      "change_frequency_raw": 1,
+      "change_frequency_norm": 0.0,
+      "complexity_raw": 1,
+      "complexity_norm": 0.0,
+      "coverage_gap": 1.0,
+      "weights": {
+        "change_frequency": 0.4,
+        "complexity": 0.3,
+        "coverage_gap": 0.3
+      }
+    },
+    "low_value": true,
+    "low_value_reasons": [
+      "test_is_low_stock_todo_needs_review: body is an empty TODO stub with no executable assertions"
+    ],
+    "trace_id": "c899bc35-a881-4378-a86f-c5349eb30fa5"
   }
 ]

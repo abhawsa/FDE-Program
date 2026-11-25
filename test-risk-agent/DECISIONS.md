@@ -106,6 +106,34 @@ decision recorded above and in the audit log.
   that merely imports the function and asserts nothing meaningful - the
   low-value detector then correctly flags it, so a reviewer is never
   given false confidence by a stub.
+- **`langfuse>=3.0.0` is required, not `2.x`** (`core/tracing.py`). The
+  package was originally pinned to `langfuse>=2.53.0,<3.0.0`. That SDK's
+  `.trace()/.span()` API targets Langfuse's old (pre-OpenTelemetry) data
+  model, which Langfuse Cloud deprecated and began removing in November
+  2026 - read endpoints (`fetch_traces`, `fetch_observations`) now return
+  `410 LANGFUSE_V3_API_REMOVED`, and since every call in `tracing.py` was
+  wrapped in a broad `try/except Exception` (by design, so a tracing
+  outage never breaks the pipeline), a failure there would have degraded
+  silently to a no-op with no visible error - exactly the kind of gap this
+  project's own audit trail is supposed to catch, just in a dependency
+  instead of a test. Caught by directly authenticating against the live
+  API (`Langfuse.auth_check()`) and querying the new
+  `GET /api/public/v2/observations` endpoint for a real span after a run,
+  rather than trusting "no exception was raised." Fixed by upgrading to
+  `langfuse>=3.0.0,<5.0.0` and rewriting `core/tracing.py` against the
+  current OpenTelemetry-based API (`start_as_current_observation(...)` as
+  a context manager, in place of the old `StatefulTraceClient`).
+  Re-verified end-to-end: 6 real `test_generation` traces from a live
+  `analyze` run were fetched back via the v2 API by trace id.
+- **A new constant needs a new test monkeypatch, every time.** Adding
+  `audit_log.GENERATION_AUDIT_LOG_JSON_PATH` (for the export above) without
+  also adding it to `tests/test_pipeline_simple_engine.py`'s isolation
+  fixture meant that test was writing its synthetic fixture data
+  (`pkg/mod.py`, reviewer `"test-reviewer"`) directly over the real
+  `audit/generation_audit_log.json` on every `pytest` run - a real
+  dependency-free-engine test polluting a tracked project file. Fixed by
+  patching the new path alongside the others in that fixture, and
+  confirmed fixed by hashing the file before and after a full test run.
 - **Two orchestration engines, one set of step functions**
   (`workflow/pipeline.py` + `workflow/langgraph_orchestrator.py`). The
   LangGraph `StateGraph` with `interrupt()` + a SQLite checkpointer gives a

@@ -31,6 +31,7 @@ from core.config import (
     load_risk_weights,
 )
 from core.models import TestDraft
+from core.tracing import tracer
 from workflow.reporting import render_draft_outcomes, render_risk_table
 
 DEFAULT_TARGET_REPO = PROJECT_ROOT / "sample_target_repo"
@@ -131,6 +132,14 @@ def cmd_analyze(args: argparse.Namespace) -> None:
         f"(out of {len(candidates)} untested risky path(s) found)."
     )
     print("Next: `review` to approve/edit/reject, then `apply` to finalize.")
+
+    tracer.flush()
+    if tracer.enabled:
+        print(f"\nLangFuse: flushed {len(drafts)} test_generation trace(s) for this run.")
+        for draft in drafts:
+            url = tracer.trace_url(draft.get("trace_id"))
+            if url:
+                print(f"  {draft['candidate']['qualname']}: {url}")
 
 
 def _render_draft(draft: TestDraft) -> None:

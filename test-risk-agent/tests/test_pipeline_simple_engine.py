@@ -29,6 +29,7 @@ def isolated_storage(tmp_path: Path, monkeypatch):
     monkeypatch.setattr(review_queue, "REVIEW_QUEUE_DIR", queue_dir)
     monkeypatch.setattr(review_queue, "ensure_data_dirs", lambda: None)
     monkeypatch.setattr(audit_log, "AUDIT_LOG_PATH", tmp_path / "audit_log.jsonl")
+    monkeypatch.setattr(audit_log, "GENERATION_AUDIT_LOG_JSON_PATH", tmp_path / "generation_audit_log.json")
     monkeypatch.setattr(audit_log, "ensure_data_dirs", lambda: None)
     monkeypatch.setattr(pipeline, "SIMPLE_STATE_PATH", tmp_path / "simple_pipeline_state.json")
     monkeypatch.setattr(pipeline, "ensure_data_dirs", lambda: None)

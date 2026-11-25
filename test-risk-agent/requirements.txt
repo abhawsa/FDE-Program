@@ -14,5 +14,8 @@ langgraph-checkpoint-sqlite>=2.0.0,<3.0.0
 anthropic>=0.39.0,<1.0.0
 
 # Observability (optional at runtime: tracing becomes a safe no-op if
-# LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY are not set)
-langfuse>=2.53.0,<3.0.0
+# LANGFUSE_PUBLIC_KEY / LANGFUSE_SECRET_KEY are not set).
+# Must be >=3.0 (OpenTelemetry-based SDK): Langfuse Cloud deprecated and
+# removed the older v2.x SDK's trace/ingestion APIs in November 2026 - see
+# DECISIONS.md for how that was caught and fixed.
+langfuse>=3.0.0,<5.0.0
