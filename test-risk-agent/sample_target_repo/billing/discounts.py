@@ -7,6 +7,8 @@ _MAX_COMBINED_DISCOUNT_RATE = 0.50
 
 
 def bulk_discount_rate(quantity: int) -> float:
+    if quantity >= 100:
+        return 0.15
     if quantity >= 50:
         return 0.10
     if quantity >= 10:
