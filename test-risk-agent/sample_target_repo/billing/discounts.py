@@ -2,7 +2,7 @@
 
 from .calculator import round_currency
 
-_VALID_COUPONS = {"SAVE10": 0.10, "SAVE20": 0.20}
+_VALID_COUPONS = {"SAVE10": 0.10, "SAVE20": 0.20, "VIP30": 0.30}
 _MAX_COMBINED_DISCOUNT_RATE = 0.50
 
 
