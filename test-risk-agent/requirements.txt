@@ -19,3 +19,7 @@ anthropic>=0.39.0,<1.0.0
 # removed the older v2.x SDK's trace/ingestion APIs in November 2026 - see
 # DECISIONS.md for how that was caught and fixed.
 langfuse>=3.0.0,<5.0.0
+
+# Local web control panel (optional at runtime: only needed for
+# `python cli.py ui` / `python webui/app.py` - the CLI works without it)
+flask>=3.0,<4.0

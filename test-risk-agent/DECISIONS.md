@@ -149,3 +149,27 @@ decision recorded above and in the audit log.
   If a generated test's target filename already exists with *different*
   content, it's reported as a conflict for manual resolution - never
   overwritten.
+- **Web UI (`webui/`) always uses the simple engine, never LangGraph.**
+  Built so the pipeline can be driven by clicking buttons instead of
+  running a CLI command per step. A stateless HTTP request per click
+  doesn't map cleanly onto the LangGraph engine's cross-process
+  `interrupt()`/resume thread, so `webui/app.py` calls
+  `workflow.pipeline`'s step functions directly - the exact same functions
+  the CLI's `--engine simple` path uses, not a reimplementation. The
+  LangGraph engine (and its genuine `interrupt()`-based pause) stays the
+  default for `python cli.py analyze`.
+- **`data/reports/` and `data/simple_pipeline_state.json` are global, not
+  per-repo.** Discovered while building and testing the web UI: pointing
+  it at a second, unrelated repo (to smoke-test the API without touching
+  the real demo data) silently overwrote these two shared files - fixed by
+  running that test against a throwaway repo passed via the `repo_root`
+  override, but the underlying single-tenant assumption is real and
+  undocumented elsewhere, worth knowing if you point this tool at more
+  than one repo from the same checkout. One side effect from that same
+  testing session: re-running "baseline" through the UI against
+  `sample_target_repo` recomputed `coverage.json` *after* the reference
+  run's 4 generated tests were already applied, so the live
+  `data/reports/latest_report.md` now shows 93.5% -> 93.5% (correct for
+  "nothing new to apply right now") instead of the original 23.9% -> 93.5%
+  story - which remains accurately preserved in this file and in the
+  published dashboard artifact, not fabricated back into the live report.

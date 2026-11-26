@@ -103,8 +103,11 @@ audit/                  # Audit trail
   generation_audit_log.json populated snapshot from the reference run
 docs/
   architecture.png
+webui/                  # optional local control panel (bonus - see "Web UI" below)
+  app.py                    Flask routes, calling agents/workflow/review/audit directly
+  static/index.html          vanilla HTML/CSS/JS, no build step
 sample_target_repo/    # synthetic seed repo used for the demo (see its own README)
-tests/                  # 53 unit/integration tests for the agent itself
+tests/                  # 60 unit/integration tests for the agent itself
 config/risk_weights.yaml
 ```
 
@@ -122,7 +125,7 @@ Requires Python 3.10+ and `git` on PATH. Verify your setup with the agent's
 own test suite:
 
 ```bash
-pytest   # 53 tests, ~1-2 min
+pytest   # 60 tests, ~1-2 min
 ```
 
 ## Environment Variables
@@ -189,6 +192,27 @@ writes **only** approved/edited drafts into `sample_target_repo/tests/`
 (flagging - never overwriting - any filename conflict with existing
 content), re-runs coverage, and writes the final report to
 `data/reports/latest_report.md`.
+
+### Web UI (optional, no commands needed)
+
+Everything above - baseline, analyze, review (approve/edit/reject), apply -
+is also available as a local control panel, so you don't need to type a
+CLI command for each step:
+
+```bash
+python cli.py ui           # or: python webui/app.py
+# -> Risk Agent Control Panel: http://127.0.0.1:5151
+```
+
+Open that URL in a browser. It's a small Flask app (`webui/app.py` +
+`webui/static/index.html`) calling the exact same `agents/`, `workflow/`,
+`review/`, `audit/` functions the CLI uses - nothing is duplicated. It
+always drives the dependency-free `workflow.pipeline` engine (a stateless
+HTTP request per click is a better fit than the LangGraph engine's
+cross-process `interrupt()`/resume thread); the LangGraph engine with its
+real pause remains available via `python cli.py analyze --engine
+langgraph` for that orchestration path. Covered by
+`tests/test_webui.py` (Flask test client, no real server needed).
 
 ## How to Inspect AI Decisions (Audit Log + LangFuse)
 

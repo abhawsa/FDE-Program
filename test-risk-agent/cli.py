@@ -261,6 +261,13 @@ def cmd_report(_args: argparse.Namespace) -> None:
     print(report_path.read_text(encoding="utf-8"))
 
 
+def cmd_ui(args: argparse.Namespace) -> None:
+    from webui.app import main as run_webui
+
+    sys.argv = ["webui", "--host", args.host, "--port", str(args.port)]
+    run_webui()
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="cli.py", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -291,6 +298,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_report = sub.add_parser("report", help="print the latest run report")
     p_report.set_defaults(func=cmd_report)
+
+    p_ui = sub.add_parser("ui", help="launch the local web control panel")
+    p_ui.add_argument("--host", default="127.0.0.1")
+    p_ui.add_argument("--port", type=int, default=5151)
+    p_ui.set_defaults(func=cmd_ui)
 
     return parser
 
