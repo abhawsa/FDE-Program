@@ -107,7 +107,7 @@ webui/                  # optional local control panel (bonus - see "Web UI" bel
   app.py                    Flask routes, calling agents/workflow/review/audit directly
   static/index.html          vanilla HTML/CSS/JS, no build step
 sample_target_repo/    # synthetic seed repo used for the demo (see its own README)
-tests/                  # 60 unit/integration tests for the agent itself
+tests/                  # 65 unit/integration tests for the agent itself
 config/risk_weights.yaml
 ```
 
@@ -125,7 +125,7 @@ Requires Python 3.10+ and `git` on PATH. Verify your setup with the agent's
 own test suite:
 
 ```bash
-pytest   # 60 tests, ~1-2 min
+pytest   # 65 tests, ~1-2 min
 ```
 
 ## Environment Variables
@@ -159,9 +159,20 @@ python cli.py analyze
 `analyze` prints the risk-ranked table (file, function, risk score, change
 frequency, complexity, coverage gap) and the list of drafted candidates,
 then pauses - nothing is written to the test suite yet. Useful flags:
-`--repo-root`, `--coverage-json`, `--lookback-days`, `--top-n`,
+`--repo-root`, `--branch`, `--coverage-json`, `--lookback-days`, `--top-n`,
 `--engine {auto,langgraph,simple}` (default `auto`: uses LangGraph if
 installed, otherwise the dependency-free engine).
+
+`--branch <name>` (accepted by both `baseline` and `analyze`) checks out
+that branch in `--repo-root` first, so the git-history and coverage inputs
+both reflect it. It refuses - rather than stashing or force-checking-out -
+if the working tree has uncommitted changes, since the CLI has no way to
+know whether you want those changes kept:
+
+```bash
+python cli.py baseline --branch payments-rework
+python cli.py analyze --branch payments-rework
+```
 
 ## How to Review/Approve Generated Tests
 
@@ -254,9 +265,6 @@ Every test-generation call and every review decision is recorded twice:
   history. A module-level constant edit (e.g. adding a dict entry outside
   any function body) correctly does **not** count toward a function's
   change frequency, even when it changes that function's behavior.
-- **No `--branch` selection yet**: analysis always runs against whatever is
-  currently checked out in `--repo-root`; to analyze a different branch,
-  check it out first.
 - **Low-value detection is heuristic, not semantic**: it checks for the
   *shape* of a test (real comparisons vs. trivial/empty assertions), not
   whether the assertions are actually correct.

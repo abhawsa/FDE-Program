@@ -134,6 +134,14 @@ decision recorded above and in the audit log.
   dependency-free-engine test polluting a tracked project file. Fixed by
   patching the new path alongside the others in that fixture, and
   confirmed fixed by hashing the file before and after a full test run.
+- **`--branch` checks out the branch, rather than reading history out-of-band
+  against an unchanged working tree** (`cli._checkout_branch`). Coverage
+  (`coverage.json`) and complexity both come from files on disk, not from
+  git blobs, so analyzing a branch without actually checking it out would
+  silently mix that branch's git history with a different branch's file
+  contents. It refuses to switch - rather than stashing or
+  force-checking-out - if the working tree has uncommitted changes, since
+  the CLI has no way to know whether the user wants those changes kept.
 - **Two orchestration engines, one set of step functions**
   (`workflow/pipeline.py` + `workflow/langgraph_orchestrator.py`). The
   LangGraph `StateGraph` with `interrupt()` + a SQLite checkpointer gives a

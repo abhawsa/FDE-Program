@@ -63,14 +63,48 @@ def _default_reviewer() -> str:
 
 def _add_common_target_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--repo-root", default=str(DEFAULT_TARGET_REPO))
+    parser.add_argument("--branch", default=None, help="check out this branch in --repo-root first (errors on uncommitted changes rather than discarding them)")
     parser.add_argument("--source-root", default=None, help="defaults to --repo-root")
     parser.add_argument("--tests-dir", default=None, help="defaults to <repo-root>/tests")
     parser.add_argument("--coverage-json", default=None, help="defaults to <repo-root>/coverage.json")
     parser.add_argument("--source-pkg", default="billing,inventory")
 
 
+def _checkout_branch(repo_root: Path, branch: Optional[str]) -> None:
+    """Check out `branch` in `repo_root`, refusing rather than discarding work.
+
+    A no-op if `branch` is None or already checked out. Aborts (rather than
+    stashing or force-checking-out) if the working tree has uncommitted
+    changes, since this CLI has no way to know whether the user wants those
+    changes kept.
+    """
+    if not branch:
+        return
+    current = subprocess.run(
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=str(repo_root), capture_output=True, text=True, check=False
+    ).stdout.strip()
+    if current == branch:
+        return
+    status = subprocess.run(
+        ["git", "status", "--porcelain"], cwd=str(repo_root), capture_output=True, text=True, check=False
+    )
+    if status.stdout.strip():
+        print(
+            f"Cannot switch to branch {branch!r}: {repo_root} has uncommitted changes.\n"
+            "Commit or stash them first, or omit --branch to analyze the currently checked-out branch.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    result = subprocess.run(["git", "checkout", branch], cwd=str(repo_root), capture_output=True, text=True, check=False)
+    if result.returncode != 0:
+        print(f"Failed to check out branch {branch!r} in {repo_root}:\n{result.stderr.strip()}", file=sys.stderr)
+        sys.exit(1)
+    print(f"Checked out branch '{branch}' in {repo_root}.")
+
+
 def cmd_baseline(args: argparse.Namespace) -> None:
     repo_root = Path(args.repo_root)
+    _checkout_branch(repo_root, args.branch)
     out_json = Path(args.coverage_json) if args.coverage_json else repo_root / "coverage.json"
     print(f"Running pytest + coverage over {repo_root} (source={args.source_pkg}) ...")
     result = coverage_delta_mod.run_coverage(repo_root, args.source_pkg, out_json)
@@ -84,6 +118,7 @@ def cmd_baseline(args: argparse.Namespace) -> None:
 def cmd_analyze(args: argparse.Namespace) -> None:
     ensure_data_dirs()
     repo_root = Path(args.repo_root).resolve()
+    _checkout_branch(repo_root, args.branch)
     source_root = Path(args.source_root).resolve() if args.source_root else repo_root
     tests_dir = Path(args.tests_dir).resolve() if args.tests_dir else repo_root / "tests"
     coverage_json = Path(args.coverage_json).resolve() if args.coverage_json else repo_root / "coverage.json"
